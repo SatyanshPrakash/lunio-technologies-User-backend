@@ -12,10 +12,10 @@ export const NavbarSection = (): JSX.Element => {
   // Navigation items data for easy mapping
   const navItems = [
     { label: "Home", hasDropdown: false, link: "/" },
-    { label: "Hardware", hasDropdown: false, link: "/" },
-    { label: "Software", hasDropdown: false },
-    { label: "Digital Products", hasDropdown: false },
-    { label: "Services", hasDropdown: false },
+    { label: "Hardware", hasDropdown: false, link: "/ProductsPage" },
+    { label: "Software", hasDropdown: false, link: "/ProductsPage" },
+    { label: "Digital Products", hasDropdown: false, link: "/ProductsPage" },
+    { label: "Services", hasDropdown: false, link: "/ProductsPage" },
     { label: "KYC Verification", hasDropdown: false, link: "/kyc" },
     { label: "Orders", hasDropdown: false, link: "/order-history" },
     { label: "Blogs", hasDropdown: false, link: "/blogs" },
