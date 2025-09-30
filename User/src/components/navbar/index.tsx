@@ -17,8 +17,8 @@ export const NavbarSection = (): JSX.Element => {
     { label: "Digital Products", hasDropdown: false },
     { label: "Services", hasDropdown: false },
     { label: "KYC Verification", hasDropdown: false },
-    { label: "Order", hasDropdown: false, link: "/order-history" },
-    { label: "Blog", hasDropdown: false, link: "/blogs" },
+    { label: "Orders", hasDropdown: false, link: "/order-history" },
+    { label: "Blogs", hasDropdown: false, link: "/blogs" },
   ];
 
   return (
