@@ -12,7 +12,7 @@ import { useNavigate } from "react-router-dom";
 
 export const Topbar = (): JSX.Element => {
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [showProfileMenu, setShowProfileMenu] = useState(true);
   const profileMenuRef = useRef<HTMLDivElement>(null);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
