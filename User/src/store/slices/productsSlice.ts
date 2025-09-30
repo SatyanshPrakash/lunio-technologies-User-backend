@@ -5,6 +5,9 @@ import type { Product, FilterState } from '../../pages/products';
 interface ProductsState {
   items: Product[];
   featuredProducts: Product[];
+  hardwareProducts: Product[];
+  softwareProducts: Product[];
+  serviceProducts: Product[];
   currentProduct: Product | null;
   loading: boolean;
   error: string | null;
@@ -20,6 +23,9 @@ interface ProductsState {
 const initialState: ProductsState = {
   items: [],
   featuredProducts: [],
+  hardwareProducts: [],
+  softwareProducts: [],
+  serviceProducts: [],
   currentProduct: null,
   loading: false,
   error: null,
@@ -109,6 +115,31 @@ export const fetchProductById = createAsyncThunk(
   }
 );
 
+export const fetchProductsByType = createAsyncThunk(
+  'products/fetchProductsByType',
+  async ({ productType, limit = 4 }: { productType: 'hardware' | 'software' | 'service'; limit?: number }, { rejectWithValue }) => {
+    try {
+      const queryParams = new URLSearchParams({
+        productType,
+        featured: 'true',
+        limit: limit.toString(),
+        status: 'active',
+      });
+
+      const response = await fetch(`http://localhost:5000/api/products?${queryParams}`);
+      const data = await response.json();
+
+      if (!response.ok) {
+        return rejectWithValue(data.message || 'Failed to fetch products');
+      }
+
+      return { type: productType, products: data.data };
+    } catch (error) {
+      return rejectWithValue('Network error. Please try again.');
+    }
+  }
+);
+
 const productsSlice = createSlice({
   name: 'products',
   initialState,
@@ -163,6 +194,24 @@ const productsSlice = createSlice({
         state.currentProduct = action.payload;
       })
       .addCase(fetchProductById.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      .addCase(fetchProductsByType.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchProductsByType.fulfilled, (state, action) => {
+        state.loading = false;
+        const { type, products } = action.payload;
+        if (type === 'hardware') {
+          state.hardwareProducts = products;
+        } else if (type === 'software') {
+          state.softwareProducts = products;
+        } else if (type === 'service') {
+          state.serviceProducts = products;
+        }
+      })
+      .addCase(fetchProductsByType.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       });

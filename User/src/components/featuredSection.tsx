@@ -1,33 +1,40 @@
-import { type JSX, useRef } from "react";
+import { type JSX, useRef, useEffect } from "react";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
+import { fetchProductsByType } from "../store/slices/productsSlice";
+import { fetchFeaturedReviews } from "../store/slices/reviewsSlice";
 import { Avatar } from "./avatar";
 import { Badge } from "./badge";
 import { Card, CardContent } from "./card";
 import { Separator } from "./seprator";
 import { Star } from "lucide-react";
-import { ChevronLeft as ChevronLeftIcon, ChevronRight as ChevronRightIcon } from "lucide-react";
+import { ChevronLeft as ChevronLeftIcon, ChevronRight as ChevronRightIcon, ShoppingCart } from "lucide-react";
 import { Button } from "../assets/button";
-import SampleImage from "../assets/ba5309c6-39fa-4f0f-9c62-de5d63d00b3b.jpg";
+import { addToCart, openCart } from "../store/slices/cartSlice";
+import { useNavigate } from "react-router-dom";
 
 export const FeaturedSection = (): JSX.Element => {
-  // Product data for reuse
-  const productData = {
-    title: "Gaming Laptop RTX 4080",
-    description: "High-performance gaming laptop with latest RTX graphics",
-    price: "$2,499",
-    label: "label",
-    backgroundImage: `url(${SampleImage})`,
-  };
-
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const reviewsScrollRef = useRef<HTMLDivElement>(null);
+
+  const { hardwareProducts, softwareProducts, serviceProducts, loading: productsLoading } = useAppSelector((state) => state.products);
+  const { featuredReviews, loading: reviewsLoading } = useAppSelector((state) => state.reviews);
+
+  useEffect(() => {
+    dispatch(fetchProductsByType({ productType: 'hardware', limit: 4 }));
+    dispatch(fetchProductsByType({ productType: 'software', limit: 4 }));
+    dispatch(fetchProductsByType({ productType: 'service', limit: 4 }));
+    dispatch(fetchFeaturedReviews());
+  }, [dispatch]);
 
   const scrollReviews = (direction: 'left' | 'right') => {
     if (reviewsScrollRef.current) {
-      const scrollAmount = 320; // Width of card + gap
+      const scrollAmount = 320;
       const currentScroll = reviewsScrollRef.current.scrollLeft;
-      const targetScroll = direction === 'left' 
-        ? currentScroll - scrollAmount 
+      const targetScroll = direction === 'left'
+        ? currentScroll - scrollAmount
         : currentScroll + scrollAmount;
-      
+
       reviewsScrollRef.current.scrollTo({
         left: targetScroll,
         behavior: 'smooth'
@@ -35,160 +42,192 @@ export const FeaturedSection = (): JSX.Element => {
     }
   };
 
-  // Game topup data
-  const gameTopupData = [
-    {
-      backgroundImage: "url(..//image-12.png)",
-      title: "Gaming Laptop RTX 4080",
-    },
-    {
-      backgroundImage: "url(..//image-13.png)",
-      title: "Gaming Laptop RTX 4080",
-    },
-    {
-      backgroundImage: "url(..//image-14.png)",
-      title: "Gaming Laptop RTX 4080",
-    },
-    {
-      backgroundImage: "url(..//image-15.png)",
-      title: "Gaming Laptop RTX 4080",
-    },
-  ];
-
-  // Review data
-  const reviewData = {
-    username: "KaiB",
-    date: "22 Jul",
-    text: "KaiB was amazing with our cats!! 🌟🌟🌟 This was our first time using a pet-sitting service, so we were naturally quite anxious. We took a chance on Kai and completely lucked out!",
-    avatar: "/avatar-4.png",
+  const handleAddToCart = (product: any) => {
+    dispatch(addToCart({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      salePrice: product.salePrice || undefined,
+      image: product.primaryImage || product.images?.[0]?.imageUrl || 'https://images.pexels.com/photos/276517/pexels-photo-276517.jpeg?auto=compress&cs=tinysrgb&w=600',
+      productType: product.productType,
+      stockStatus: product.stockStatus,
+      maxQuantity: product.stockQuantity,
+    }));
+    dispatch(openCart());
   };
 
-  // Function to render product cards
-  const renderProductCards = () => {
-    return Array(4)
-      .fill(null)
-      .map((_, index) => (
+  const renderProductCards = (products: any[], title: string) => {
+    if (productsLoading && products.length === 0) {
+      return Array(4).fill(null).map((_, index) => (
         <Card
-          key={`product-${index}`}
-          className="w-full sm:w-72 lg:w-80 rounded-xl overflow-hidden shadow-[0px_0px_4px_#00000040] bg-backgroundsnow-white flex-shrink-0 "
+          key={`skeleton-${index}`}
+          className="w-full sm:w-72 lg:w-80 rounded-xl overflow-hidden shadow-[0px_0px_4px_#00000040] bg-backgroundsnow-white flex-shrink-0 animate-pulse"
         >
-          <div
-            className="relative w-full h-40 lg:h-[198px]"
-            style={{ background: productData.backgroundImage }}
-          >
-            <Badge className="absolute top-3 lg:top-[18px] right-3 lg:right-5 bg-[#3c3c43] text-backgroundsnow-white rounded-[100px] border border-solid p-1 lg:p-2">
-              <span className="[font-family:'Source_Code_Pro',Helvetica] text-xs text-white">
-                {productData.label}
-              </span>
-            </Badge>
-          </div>
+          <div className="w-full h-40 lg:h-[198px] bg-gray-200" />
           <CardContent className="flex flex-col items-start gap-2.5 p-4 lg:p-6">
-            <div className="flex flex-col items-start gap-1.5 w-full">
-              <h3 className="[font-family:'Poppins',Helvetica] font-normal text-black text-lg lg:text-xl">
-                {productData.title}
-              </h3>
-              <p className="[font-family:'Poppins',Helvetica] font-normal text-[#666666] text-sm lg:text-[15px]">
-                {productData.description}
-              </p>
-              <div className="flex items-start gap-1.5">
-                {Array(5)
-                  .fill(null)
-                  .map((_, i) => (
-                    <Star
-                    type="filled"
-                    color="#FBBF24"
-                      key={`star-${index}-${i}`}
-                      className="w-4 h-4 lg:w-[19.02px] lg:h-[18.09px]"
-                    />
-                  ))}
-              </div>
-            </div>
-            <p className="[font-family:'Poppins',Helvetica] font-normal text-black text-sm lg:text-[15px]">
-              {productData.price}
-            </p>
+            <div className="h-4 bg-gray-200 rounded w-3/4" />
+            <div className="h-3 bg-gray-200 rounded w-full" />
+            <div className="h-3 bg-gray-200 rounded w-2/3" />
           </CardContent>
         </Card>
       ));
+    }
+
+    if (products.length === 0) {
+      return (
+        <div className="w-full text-center py-8 text-gray-500">
+          No {title.toLowerCase()} products available
+        </div>
+      );
+    }
+
+    return products.map((product) => {
+      const displayPrice = product.salePrice || product.price;
+      const avgRating = 4.5;
+
+      return (
+        <Card
+          key={product.id}
+          className="w-full sm:w-72 lg:w-80 rounded-xl overflow-hidden shadow-[0px_0px_4px_#00000040] bg-backgroundsnow-white flex-shrink-0 hover:shadow-lg transition-shadow cursor-pointer"
+          onClick={() => navigate(`/product/${product.id}`)}
+        >
+          <div
+            className="relative w-full h-40 lg:h-[198px] bg-cover bg-center"
+            style={{
+              backgroundImage: `url(${product.primaryImage || product.images?.[0]?.imageUrl || 'https://images.pexels.com/photos/276517/pexels-photo-276517.jpeg?auto=compress&cs=tinysrgb&w=600'})`
+            }}
+          >
+            {product.featured && (
+              <Badge className="absolute top-3 lg:top-[18px] right-3 lg:right-5 bg-[#3c3c43] text-backgroundsnow-white rounded-[100px] border border-solid p-1 lg:p-2">
+                <span className="[font-family:'Source_Code_Pro',Helvetica] text-xs text-white">
+                  Featured
+                </span>
+              </Badge>
+            )}
+          </div>
+          <CardContent className="flex flex-col items-start gap-2.5 p-4 lg:p-6">
+            <div className="flex flex-col items-start gap-1.5 w-full">
+              <h3 className="[font-family:'Poppins',Helvetica] font-normal text-black text-lg lg:text-xl line-clamp-1">
+                {product.name}
+              </h3>
+              <p className="[font-family:'Poppins',Helvetica] font-normal text-[#666666] text-sm lg:text-[15px] line-clamp-2">
+                {product.shortDescription || product.description}
+              </p>
+              <div className="flex items-start gap-1.5">
+                {Array(5).fill(null).map((_, i) => (
+                  <Star
+                    key={`star-${product.id}-${i}`}
+                    className="w-4 h-4 lg:w-[19.02px] lg:h-[18.09px]"
+                    fill={i < Math.floor(avgRating) ? "#FBBF24" : "none"}
+                    color="#FBBF24"
+                  />
+                ))}
+              </div>
+            </div>
+            <div className="flex items-center justify-between w-full">
+              <p className="[font-family:'Poppins',Helvetica] font-semibold text-black text-lg lg:text-xl">
+                ${displayPrice.toFixed(2)}
+                {product.salePrice && (
+                  <span className="ml-2 text-sm text-gray-500 line-through">
+                    ${product.price.toFixed(2)}
+                  </span>
+                )}
+              </p>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleAddToCart(product);
+                }}
+                disabled={product.stockStatus === 'out_of_stock'}
+                className="p-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 text-white rounded-lg transition-colors"
+              >
+                <ShoppingCart className="w-5 h-5" />
+              </button>
+            </div>
+          </CardContent>
+        </Card>
+      );
+    });
   };
 
-  // Function to render game topup cards
-  const renderGameTopupCards = () => {
-    return gameTopupData.map((game, index) => (
-      <Card
-        key={`game-${index}`}
-        className="w-full sm:w-72 lg:w-80 rounded-xl overflow-hidden shadow-[0px_0px_4px_#00000040] bg-colourprimary flex-shrink-0"
-      >
-        <div
-          className="relative w-full h-48 lg:h-[307px]"
-          style={{ background: game.backgroundImage }}
+  const renderReviewCards = () => {
+    if (reviewsLoading && featuredReviews.length === 0) {
+      return Array(3).fill(null).map((_, index) => (
+        <Card
+          key={`skeleton-review-${index}`}
+          className="flex-none p-4 lg:p-5 bg-white rounded-[13px] w-72 lg:w-auto animate-pulse"
         >
-          <Badge className="absolute top-3 lg:top-[18px] right-3 lg:right-5 bg-[#3c3c43] text-colourprimary rounded-[100px] border border-solid p-1 lg:p-2">
-            <span className="[font-family:'Source_Code_Pro',Helvetica] text-xs">
-              label
-            </span>
-          </Badge>
+          <CardContent className="p-0 flex flex-col gap-2.5">
+            <div className="flex items-center gap-3.5">
+              <div className="w-10 h-10 lg:w-[54.17px] lg:h-[54.17px] bg-gray-200 rounded-full" />
+              <div className="h-4 bg-gray-200 rounded w-24" />
+            </div>
+            <div className="h-3 bg-gray-200 rounded w-full" />
+            <div className="h-3 bg-gray-200 rounded w-3/4" />
+          </CardContent>
+        </Card>
+      ));
+    }
+
+    if (featuredReviews.length === 0) {
+      return (
+        <div className="w-full text-center py-8 text-gray-500">
+          No reviews available
         </div>
-        <CardContent className="flex flex-col items-start gap-2.5 p-4 lg:p-6">
-          <div className="flex flex-col items-start gap-1.5 w-full">
-            <h3 className="[font-family:'Poppins',Helvetica] font-normal text-black text-lg lg:text-xl">
-              {game.title}
-            </h3>
+      );
+    }
+
+    return featuredReviews.map((review) => (
+      <Card
+        key={review.id}
+        className="flex-none p-4 lg:p-5 bg-white rounded-[13px] w-72 lg:w-auto"
+      >
+        <CardContent className="p-0 flex flex-col gap-2.5">
+          <div className="flex flex-col w-full lg:w-[296.83px] gap-2.5">
+            <div className="flex items-center gap-3.5">
+              <Avatar className="w-10 h-10 lg:w-[54.17px] lg:h-[54.17px]">
+                <div className="w-full h-full bg-gradient-to-br from-blue-400 to-purple-600 flex items-center justify-center text-white font-bold">
+                  {review.userName?.charAt(0).toUpperCase() || 'U'}
+                </div>
+              </Avatar>
+              <span className="[font-family:'Heebo',Helvetica] font-medium text-[#323232] text-lg lg:text-[23.7px] lg:leading-[35.6px]">
+                {review.userName}
+              </span>
+              <div className="w-1 h-1 lg:w-[3.39px] lg:h-[3.39px] bg-[#323232] rounded-full" />
+              <span className="[font-family:'Heebo',Helvetica] font-normal text-[#323232] text-sm lg:text-[18px]">
+                {new Date(review.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+              </span>
+            </div>
+            <div className="flex items-center gap-1">
+              {Array(5).fill(null).map((_, i) => (
+                <Star
+                  key={`review-star-${review.id}-${i}`}
+                  className="w-4 h-4"
+                  fill={i < review.rating ? "#FBBF24" : "none"}
+                  color="#FBBF24"
+                />
+              ))}
+            </div>
+          </div>
+          <div className="relative w-full lg:w-[296.83px]">
+            {review.title && (
+              <p className="[font-family:'Heebo',Helvetica] font-semibold text-[#323232] text-base mb-2">
+                {review.title}
+              </p>
+            )}
+            <p className="[font-family:'Heebo',Helvetica] font-normal text-[#323232] text-sm leading-[21px] line-clamp-4">
+              {review.comment}
+            </p>
           </div>
         </CardContent>
       </Card>
     ));
   };
 
-  // Function to render review cards
-  const renderReviewCards = () => {
-    return Array(5)
-      .fill(null)
-      .map((_, index) => (
-        <Card
-          key={`review-${index}`}
-          className="flex-none p-4 lg:p-5 bg-white rounded-[13px] w-72 lg:w-auto"
-        >
-          <CardContent className="p-0 flex flex-col gap-2.5">
-            <div className="flex flex-col w-full lg:w-[296.83px] gap-2.5">
-              <div className="flex items-center gap-3.5">
-                <Avatar className="w-10 h-10 lg:w-[54.17px] lg:h-[54.17px]">
-                  <img
-                    className="object-cover"
-                    alt="Avatar"
-                    src={reviewData.avatar}
-                  />
-                </Avatar>
-                <span className="[font-family:'Heebo',Helvetica] font-medium text-[#323232] text-lg lg:text-[23.7px] lg:leading-[35.6px]">
-                  {reviewData.username}
-                </span>
-                <div className="w-1 h-1 lg:w-[3.39px] lg:h-[3.39px] bg-[#323232] rounded-full" />
-                <span className="[font-family:'Heebo',Helvetica] font-normal text-[#323232] text-lg lg:text-[23.7px] lg:leading-[35.6px]">
-                  {" "}
-                  {reviewData.date}
-                </span>
-              </div>
-              <img className="flex-none" alt="Stars" src="/stars.svg" />
-            </div>
-            <div className="relative w-full lg:w-[296.83px] h-32">
-              <p className="absolute w-full lg:w-[297px] h-[98px] -top-0.5 left-0 [font-family:'Heebo',Helvetica] font-normal text-[#323232] text-sm leading-[21px] overflow-hidden text-ellipsis [display:-webkit-box] [-webkit-line-clamp:4] [-webkit-box-orient:vertical]">
-                {reviewData.text}
-              </p>
-              <p className="absolute w-full lg:w-[297px] h-5 top-[106px] left-0 [font-family:'Heebo',Helvetica] font-medium text-[#72479c] text-sm lg:text-[15px] text-right leading-[22.5px]">
-                Read More
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-      ));
-  };
-
-  // Function to render section header
   const renderSectionHeader = (title: string) => {
     return (
       <div className="flex flex-col w-full lg:w-[386px] items-start lg:items-end gap-[5px]">
-        <h2
-          className="self-stretch mt-[-1.00px] [font-family:'Jura'] font-semibold text-black text-2xl lg:text-[40px] tracking-[0] leading-[normal]"
-        >
+        <h2 className="self-stretch mt-[-1.00px] [font-family:'Jura'] font-semibold text-black text-2xl lg:text-[40px] tracking-[0] leading-[normal]">
           {title}
         </h2>
         <Separator className="w-20 lg:w-40 h-0.5 bg-purple" />
@@ -196,140 +235,78 @@ export const FeaturedSection = (): JSX.Element => {
     );
   };
 
-  // Function to render "See more" link
-  const renderSeeMoreLink = () => {
+  const renderSeeMore = (route: string) => {
     return (
-      <div className="flex flex-col w-full lg:w-[386px] items-end gap-[5px]">
-        <div className="inline-flex items-center justify-end gap-[5px] ml-[-23.00px]">
-          <p className="w-full lg:w-[386px] mt-[-1.00px] [font-family:'Poppins',Helvetica] font-normal text-black text-sm lg:text-base text-right tracking-[0] leading-[normal]">
-            See more
-          </p>
-          <div className="w-[18px] h-[18px] overflow-hidden rotate-90">
-            <img
-              className="absolute w-3 h-2.5 top-1 left-[3px] -rotate-90"
-              alt="Vector"
-              src="/vector.svg"
-            />
-          </div>
-        </div>
-        <Separator className="w-6 lg:w-10 h-0.5 bg-primaryhan-purple" />
-      </div>
+      <button
+        onClick={() => navigate(route)}
+        className="[font-family:'Poppins',Helvetica] font-normal text-black text-base underline hover:text-blue-600 transition-colors"
+      >
+        See more
+      </button>
     );
   };
 
   return (
-    <section className="flex flex-col w-full max-w-[1405px] gap-8 lg:gap-[30px] mx-auto px-4 lg:px-0 my-20">
-      {/* Featured Hardware Section */}
-      <div className="relative w-full">
-        <div className="mb-4 lg:mb-8">
+    <div className="flex flex-col w-full items-center px-4 lg:px-0 gap-16 lg:gap-28 py-12 lg:py-[100px] bg-white">
+      {/* Hardware Section */}
+      <div className="flex flex-col items-center gap-8 lg:gap-[49px] w-full max-w-[1350px]">
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center w-full gap-4">
           {renderSectionHeader("Featured Hardware")}
+          {renderSeeMore("/products?type=hardware")}
         </div>
-        <div className="flex gap-4 lg:gap-[30px] overflow-x-auto pb-4 mb-4">
-          {renderProductCards()}
-        </div>
-        <div className="flex justify-end">
-          {renderSeeMoreLink()}
+        <div className="flex gap-4 lg:gap-10 w-full overflow-x-auto pb-4 scrollbar-hide">
+          {renderProductCards(hardwareProducts, "Hardware")}
         </div>
       </div>
 
-      {/* Featured Software Section */}
-      <div className="relative w-full">
-        <div className="mb-4 lg:mb-8">
+      {/* Software Section */}
+      <div className="flex flex-col items-center gap-8 lg:gap-[49px] w-full max-w-[1350px]">
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center w-full gap-4">
           {renderSectionHeader("Featured Software")}
+          {renderSeeMore("/products?type=software")}
         </div>
-        <div className="flex gap-4 lg:gap-[30px] overflow-x-auto pb-4 mb-4">
-          {renderProductCards()}
-        </div>
-        <div className="flex justify-end">
-          {renderSeeMoreLink()}
+        <div className="flex gap-4 lg:gap-10 w-full overflow-x-auto pb-4 scrollbar-hide">
+          {renderProductCards(softwareProducts, "Software")}
         </div>
       </div>
 
-      {/* Featured Services Section */}
-      <div className="relative w-full">
-        <div className="mb-4 lg:mb-8">
+      {/* Services Section */}
+      <div className="flex flex-col items-center gap-8 lg:gap-[49px] w-full max-w-[1350px]">
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center w-full gap-4">
           {renderSectionHeader("Featured Services")}
+          {renderSeeMore("/products?type=service")}
         </div>
-        <div className="flex gap-4 lg:gap-[30px] overflow-x-auto pb-4 mb-4">
-          {renderProductCards()}
-        </div>
-        <div className="flex justify-end">
-          {renderSeeMoreLink()}
-        </div>
-      </div>
-
-      {/* Games Topup Section */}
-      <div className="relative w-full">
-        <div className="mb-4 lg:mb-8 flex flex-col items-start gap-[5px]">
-          <div className="flex items-start justify-end gap-5">
-            <h2 className="mt-[-1.00px] [font-family:'Jura',Helvetica] font-semibold text-black text-2xl lg:text-[40px] tracking-[0] leading-[normal]">
-              GAMES TOPUP SECTION
-            </h2>
-            <div className="relative w-6 h-8 lg:w-[30px] lg:h-[60px]">
-              <img
-                className="absolute w-4 h-6 lg:w-[18px] lg:h-8 top-1 lg:top-3.5 left-1 lg:left-1.5"
-                alt="Vector"
-                src="/vector-3.svg"
-              />
-            </div>
-          </div>
-          <Separator className="w-20 lg:w-40 h-0.5 bg-primaryhan-purple" />
-        </div>
-        <div className="flex gap-4 lg:gap-[30px] overflow-x-auto pb-4 mb-4">
-          {renderGameTopupCards()}
-        </div>
-        <div className="flex justify-end">
-          {renderSeeMoreLink()}
+        <div className="flex gap-4 lg:gap-10 w-full overflow-x-auto pb-4 scrollbar-hide">
+          {renderProductCards(serviceProducts, "Services")}
         </div>
       </div>
 
       {/* Reviews Section */}
-       <div className="flex flex-col gap-6 lg:gap-10 w-full relative">
-        <div className="flex flex-col items-start gap-[5px] bg-white">
-          <div className="flex items-start justify-end gap-5">
-            <h2 className="mt-[-1.00px] [font-family:'Jura',Helvetica] font-semibold text-black text-2xl lg:text-[40px] tracking-[0] leading-[normal]">
-              Reviews
-            </h2>
-            <div className="relative w-6 h-8 lg:w-[30px] lg:h-[60px]">
-              <img
-                className="absolute w-4 h-6 lg:w-[18px] lg:h-8 top-1 lg:top-3.5 left-1 lg:left-1.5"
-                alt="Vector"
-                src="/vector-3.svg"
-              />
-            </div>
+      <div className="flex flex-col items-center gap-8 lg:gap-[49px] w-full max-w-[1350px]">
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center w-full gap-4">
+          {renderSectionHeader("What Our Customers Say")}
+          <div className="flex gap-2">
+            <Button
+              onClick={() => scrollReviews('left')}
+              className="p-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+            >
+              <ChevronLeftIcon className="w-5 h-5" />
+            </Button>
+            <Button
+              onClick={() => scrollReviews('right')}
+              className="p-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+            >
+              <ChevronRightIcon className="w-5 h-5" />
+            </Button>
           </div>
-          <Separator className="w-20 lg:w-[130px] h-0.5 bg-primaryhan-purple" />
         </div>
-        
-        <div className="relative w-full">
-          {/* Left Arrow Button */}
-          <Button
-            onClick={() => scrollReviews('left')}
-            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 lg:w-12 lg:h-12 rounded-full bg-white/90 hover:bg-white shadow-lg border border-gray-200 p-0 hidden sm:flex items-center justify-center"
-            variant="outline"
-          >
-            <ChevronLeftIcon className="w-5 h-5 lg:w-6 lg:h-6 text-gray-700" />
-          </Button>
-
-          {/* Right Arrow Button */}
-          <Button
-            onClick={() => scrollReviews('right')}
-            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 lg:w-12 lg:h-12 rounded-full bg-white/90 hover:bg-white shadow-lg border border-gray-200 p-0 hidden sm:flex items-center justify-center"
-            variant="outline"
-          >
-            <ChevronRightIcon className="w-5 h-5 lg:w-6 lg:h-6 text-gray-700" />
-          </Button>
-
-          {/* Reviews Container */}
-          <div 
-            ref={reviewsScrollRef}
-            className="flex gap-4 lg:gap-[30px] w-full overflow-x-hidden pb-4 scrollbar-hide px-0 sm:px-8"
-          >
-            {renderReviewCards()}
-          </div>
+        <div
+          ref={reviewsScrollRef}
+          className="flex gap-4 lg:gap-5 w-full overflow-x-auto pb-4 scrollbar-hide scroll-smooth"
+        >
+          {renderReviewCards()}
         </div>
       </div>
-    </section>
+    </div>
   );
 };
-
