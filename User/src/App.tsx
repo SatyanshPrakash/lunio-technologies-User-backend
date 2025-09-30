@@ -7,6 +7,7 @@ import { NavbarSection } from './components/navbar';
 import { Topbar } from './components/topbar';
 import { CTASection } from './components/deliverTo/CTASection';
 import { Footer } from './components/footer';
+import { CartDrawer } from './components/cart/CartDrawer';
 import type { Order } from './types';
 
 const mockOrders: Order[] = [
@@ -163,14 +164,17 @@ const AppContent = () => {
   };
 
   return (
-    <Layout>
-      <AppRoutes
-        selectedOrder={selectedOrder}
-        onOrderSelect={handleOrderSelect}
-        onBackToHistory={handleBackToHistory}
-        mockOrders={mockOrders}
-      />
-    </Layout>
+    <>
+      <Layout>
+        <AppRoutes
+          selectedOrder={selectedOrder}
+          onOrderSelect={handleOrderSelect}
+          onBackToHistory={handleBackToHistory}
+          mockOrders={mockOrders}
+        />
+      </Layout>
+      <CartDrawer />
+    </>
   );
 };
 

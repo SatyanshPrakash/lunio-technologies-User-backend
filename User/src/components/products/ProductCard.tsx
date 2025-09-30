@@ -1,5 +1,7 @@
 import { ShoppingCart, Star, Package, Download, Settings } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useAppDispatch } from '../../store/hooks';
+import { addToCart, openCart } from '../../store/slices/cartSlice';
 import type { Product } from '../../pages/products';
 
 interface ProductCardProps {
@@ -7,11 +9,30 @@ interface ProductCardProps {
 }
 
 export const ProductCard = ({ product }: ProductCardProps) => {
+  const dispatch = useAppDispatch();
   const displayPrice = product.salePrice || product.price;
   const hasDiscount = product.salePrice && product.salePrice < product.price;
   const discountPercent = hasDiscount
     ? Math.round(((product.price - product.salePrice!) / product.price) * 100)
     : 0;
+
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    dispatch(addToCart({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      salePrice: product.salePrice || undefined,
+      image: product.primaryImage || product.images[0]?.imageUrl || 'https://images.pexels.com/photos/276517/pexels-photo-276517.jpeg?auto=compress&cs=tinysrgb&w=600',
+      productType: product.productType,
+      stockStatus: product.stockStatus,
+      maxQuantity: product.stockQuantity,
+    }));
+
+    dispatch(openCart());
+  };
 
   const getProductIcon = () => {
     switch (product.productType) {
@@ -157,6 +178,7 @@ export const ProductCard = ({ product }: ProductCardProps) => {
         </div>
 
         <button
+          onClick={handleAddToCart}
           disabled={product.stockStatus === 'out_of_stock'}
           className="mt-4 w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white py-2.5 px-4 rounded-lg font-medium flex items-center justify-center gap-2 transition-colors"
         >

@@ -1,16 +1,30 @@
-import { SearchIcon, Globe } from "lucide-react";
+import { SearchIcon, Globe, ShoppingCart } from "lucide-react";
 import { useState } from "react";
 import { Button } from "../../assets/button"
 import { Input } from "../../assets/input";
 import type { JSX } from "react";
 import LogoImage from "../../../assets/favicons/lunio mein logo ai febicon png-2-01.png";
 import ThemeToggle from "../../assets/ThemeToggle";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { toggleCart } from "../../store/slices/cartSlice";
+import { useNavigate } from "react-router-dom";
 
 export const Topbar = (): JSX.Element => {
- const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const { totalItems } = useAppSelector((state) => state.cart);
 
   const toggleTheme = () => {
     setIsDarkMode(!isDarkMode);
+  };
+
+  const handleCartClick = () => {
+    dispatch(toggleCart());
+  };
+
+  const handleSignIn = () => {
+    navigate('/login');
   };
 
   return (
@@ -37,10 +51,21 @@ export const Topbar = (): JSX.Element => {
       <ThemeToggle isDark={isDarkMode} onToggle={toggleTheme} />
 
         <div className="flex items-center justify-center gap-5">
-          <div className="w-[45px] h-[45px] bg-[url(/vector-18.svg)] bg-[100%_100%]" />
+          <button
+            onClick={handleCartClick}
+            className="relative w-[45px] h-[45px] flex items-center justify-center bg-white rounded-full hover:bg-gray-100 transition-colors shadow-md"
+          >
+            <ShoppingCart className="w-6 h-6 text-[#4682b4]" />
+            {totalItems > 0 && (
+              <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
+                {totalItems > 9 ? '9+' : totalItems}
+              </span>
+            )}
+          </button>
 
           <Button
             variant="outline"
+            onClick={handleSignIn}
             className="h-[52px] px-[30px] py-0 bg-white rounded-[10px] border-2 border-solid border-[#7f5af0] shadow-[0px_4px_4px_#0000004c] font-['Poppins',Helvetica] font-normal text-[#4682b4] text-base"
           >
             Sign in
