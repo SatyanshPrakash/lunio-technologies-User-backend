@@ -2,21 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { submitKYC, fetchKYCStatus, clearError } from '../store/slices/kycSlice';
-import {
-  Upload,
-  Camera,
-  CheckCircle2,
-  AlertCircle,
-  X,
-  FileText,
-  User,
-  CreditCard,
-  Image as ImageIcon,
-  ChevronDown,
-  Info,
-  Loader2,
-  Shield,
-} from 'lucide-react';
+import { Upload, Camera, CircleCheck as CheckCircle2, CircleAlert as AlertCircle, X, FileText, User, CreditCard, Image as ImageIcon, ChevronDown, Info, Loader as Loader2, Shield } from 'lucide-react';
 
 const DOCUMENT_TYPES = [
   { value: 'passport', label: 'Passport', format: 'Format: AB1234567' },
