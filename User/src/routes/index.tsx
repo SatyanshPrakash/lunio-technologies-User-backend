@@ -32,7 +32,7 @@ export const AppRoutes = ({ selectedOrder, onOrderSelect, onBackToHistory, mockO
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
-      <Route path="/" element={<ProductsPage />} />
+      <Route path="/" element={<Home />} />
       <Route path="/products" element={<ProductsPage />} />
       <Route path="/product/:id" element={<ProductInfoHardware />} />
       <Route path="/product-details" element={<ProductInfoHardware />} />
