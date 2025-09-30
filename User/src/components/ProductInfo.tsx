@@ -6,7 +6,6 @@ import { Star } from 'lucide-react'
 
 const ProductInfo = () => {
   const [selectedPack, setSelectedPack] = useState<string>('$12');
-  const [activeTab, setActiveTab] = useState<'description' | 'reviews'>('description');
   const packs = ['$12', '$20', '$25', '$40', '$60'];
 
 //   const navigate = useNavigate(); // ✅ Added

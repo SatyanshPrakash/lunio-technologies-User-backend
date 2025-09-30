@@ -1,5 +1,5 @@
 import React from 'react';
-import { Package, ArrowLeft } from 'lucide-react';
+import { Package } from 'lucide-react';
 import type { Order } from '../types';
 import { OrderCard } from '../components/orderCard'
 interface OrderHistoryProps {

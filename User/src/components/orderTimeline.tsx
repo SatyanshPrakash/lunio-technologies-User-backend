@@ -14,7 +14,7 @@ const timelineSteps = [
 ];
 
 export const OrderTimeline: React.FC<OrderTimelineProps> = ({ currentStatus }) => {
-  const getStepStatus = (stepKey: string, index: number) => {
+  const getStepStatus = (stepKey: string) => {
     if (currentStatus === 'Cancelled') {
       return 'cancelled';
     }
@@ -82,7 +82,7 @@ export const OrderTimeline: React.FC<OrderTimelineProps> = ({ currentStatus }) =
       <h3 className="font-semibold text-gray-900 mb-4">Order Status</h3>
       <div className="relative">
         {timelineSteps.map((step, index) => {
-          const status = getStepStatus(step.key, index);
+          const status = getStepStatus(step.key);
           return (
             <div key={step.key} className="relative flex items-center pb-8 last:pb-0">
               {index < timelineSteps.length - 1 && (

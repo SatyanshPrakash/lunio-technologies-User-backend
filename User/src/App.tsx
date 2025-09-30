@@ -3,16 +3,13 @@ import { useState } from "react";
 import type { Order } from "./types";
 import Blog from "./pages/blog";
 import Blogs from "./pages/blogs";
-import ProductInfo from "./components/ProductInfo";
 import RewardsPage from "./pages/rewards";
 import { NavbarSection } from "./components/navbar";
 import { Topbar } from "./components/topbar";
 import { CTASection } from "./components/deliverTo/CTASection";
 import { Footer } from "./components/footer";
-import Review from "./components/Review";
-import SimilarItems from "./components/similarItems";
-import ProductDetailsHardware from "./components/productDetailsHardware";
 import ProductInfoHardware from "./pages/productInfoHardware";
+import { ProductsPage } from "./pages/products";
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { OrderHistory } from "./pages/orderHistory";
 import { OrderDetails } from "./pages/orderDetails";
@@ -57,6 +54,8 @@ const App = () => {
         <Routes>
           
           <Route path="/" element={<Home />} />
+          <Route path="/products" element={<ProductsPage />} />
+          <Route path="/product/:id" element={<ProductInfoHardware />} />
           <Route path="/product-details" element={<ProductInfoHardware />} />
           <Route path="/blogs" element={<Blogs />} />
           <Route path="/blog" element={<Blog />} />

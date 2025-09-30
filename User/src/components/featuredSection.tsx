@@ -7,7 +7,6 @@ import { Star } from "lucide-react";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import { Button } from "../assets/button";
 import SampleImage from "../assets/ba5309c6-39fa-4f0f-9c62-de5d63d00b3b.jpg";
-import { useNavigate } from "react-router";
 
 export const FeaturedSection = (): JSX.Element => {
   // Product data for reuse
@@ -18,8 +17,6 @@ export const FeaturedSection = (): JSX.Element => {
     label: "label",
     backgroundImage: `url(${SampleImage})`,
   };
-
-  const navigate = useNavigate();
 
   const reviewsScrollRef = useRef<HTMLDivElement>(null);
 

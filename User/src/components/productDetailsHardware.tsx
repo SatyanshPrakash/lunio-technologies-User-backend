@@ -38,11 +38,10 @@ interface ProductDetailsProps {
   cartItemCount: number;
 }
 
-const ProductDetailsHardware: React.FC<ProductDetailsProps> = ({ 
-  product, 
-  onAddToCart, 
-  onGoToCheckout,
-  cartItemCount 
+const ProductDetailsHardware: React.FC<ProductDetailsProps> = ({
+  product,
+  onAddToCart,
+  onGoToCheckout
 }) => {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [selectedColor, setSelectedColor] = useState(product.colors[0]);

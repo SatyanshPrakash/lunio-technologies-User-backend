@@ -12,6 +12,12 @@ const getProducts = async (req, res) => {
     const category = req.query.category || '';
     const status = req.query.status || '';
     const featured = req.query.featured;
+    const productType = req.query.productType || '';
+    const brand = req.query.brand || '';
+    const minPrice = req.query.minPrice;
+    const maxPrice = req.query.maxPrice;
+    const sortBy = req.query.sortBy || 'createdAt';
+    const sortOrder = req.query.sortOrder || 'DESC';
 
     let whereConditions = [];
     let queryParams = [];
@@ -36,6 +42,26 @@ const getProducts = async (req, res) => {
       queryParams.push(featured === 'true' ? 1 : 0);
     }
 
+    if (productType) {
+      whereConditions.push('p.productType = ?');
+      queryParams.push(productType);
+    }
+
+    if (brand) {
+      whereConditions.push('p.brand = ?');
+      queryParams.push(brand);
+    }
+
+    if (minPrice !== undefined) {
+      whereConditions.push('p.price >= ?');
+      queryParams.push(parseFloat(minPrice));
+    }
+
+    if (maxPrice !== undefined) {
+      whereConditions.push('p.price <= ?');
+      queryParams.push(parseFloat(maxPrice));
+    }
+
     const whereClause = whereConditions.length > 0 ? `WHERE ${whereConditions.join(' AND ')}` : '';
 
     // Get total count
@@ -46,9 +72,13 @@ const getProducts = async (req, res) => {
 
     const total = countResult[0].total;
 
+    const validSortColumns = ['createdAt', 'price', 'name', 'stockQuantity'];
+    const validSortBy = validSortColumns.includes(sortBy) ? sortBy : 'createdAt';
+    const validSortOrder = sortOrder.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
+
     // Get products with category and primary image
     const [products] = await pool.execute(
-      `SELECT 
+      `SELECT
         p.*,
         c.name as categoryName,
         pi.imageUrl as primaryImage
@@ -56,7 +86,7 @@ const getProducts = async (req, res) => {
       LEFT JOIN categories c ON p.categoryId = c.id
       LEFT JOIN product_images pi ON p.id = pi.productId AND pi.isPrimary = 1
       ${whereClause}
-      ORDER BY p.createdAt DESC
+      ORDER BY p.${validSortBy} ${validSortOrder}
       LIMIT ? OFFSET ?`,
       [...queryParams, limit, offset]
     );
