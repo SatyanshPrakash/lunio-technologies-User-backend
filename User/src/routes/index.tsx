@@ -9,6 +9,7 @@ import RewardsPage from '../pages/rewards';
 import { OrderHistory } from '../pages/orderHistory';
 import { OrderDetails } from '../pages/orderDetails';
 import { LoginPage } from '../pages/login';
+import { ProfilePage } from '../pages/profile';
 import type { Order } from '../types';
 
 interface AppRoutesProps {
@@ -40,6 +41,15 @@ export const AppRoutes = ({ selectedOrder, onOrderSelect, onBackToHistory, mockO
       <Route path="/blog/:id" element={<Blog />} />
       <Route path="/blog" element={<Blog />} />
       <Route path="/rewards" element={<RewardsPage />} />
+
+      <Route
+        path="/profile"
+        element={
+          <ProtectedRoute>
+            <ProfilePage />
+          </ProtectedRoute>
+        }
+      />
 
       <Route
         path="/order-history"

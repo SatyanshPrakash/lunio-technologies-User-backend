@@ -1,237 +1,300 @@
-import React from 'react';
-import type { JSX } from 'react';
-import heroBackgroundImage from "../assets/HeroBackgroundImage.jpeg";
-import LogoImage from "../../assets/favicons/lunio mein logo ai febicon png-01.png";
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAppDispatch, useAppSelector } from '../store/hooks';
+import { login, register, clearError } from '../store/slices/authSlice';
+import { Eye, EyeOff, Mail, Lock, User, Phone, LogIn, UserPlus, AlertCircle } from 'lucide-react';
+import LogoImage from "../../assets/favicons/lunio mein logo ai febicon png-2-01.png";
 
-// Utility function for class names
-function cn(...inputs: (string | undefined | null | boolean)[]): string {
-  return inputs.filter(Boolean).join(' ');
-}
+export const LoginPage = () => {
+  const [isLogin, setIsLogin] = useState(true);
+  const [showPassword, setShowPassword] = useState(false);
+  const [formData, setFormData] = useState({
+    fullName: '',
+    email: '',
+    phone: '',
+    password: '',
+    confirmPassword: '',
+  });
 
-// Button component
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'default' | 'link';
-  children: React.ReactNode;
-}
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const { loading, error, isAuthenticated } = useAppSelector((state) => state.auth);
 
-const Button: React.FC<ButtonProps> = ({ 
-  variant = 'default', 
-  className = '', 
-  children, 
-  ...props 
-}) => {
-  const baseClasses = "inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background";
-  
-  const variantClasses = {
-    default: "bg-primary text-primary-foreground hover:bg-primary/90 h-10 py-2 px-4",
-    link: "underline-offset-4 hover:underline text-primary h-auto p-0"
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/');
+    }
+  }, [isAuthenticated, navigate]);
+
+  useEffect(() => {
+    dispatch(clearError());
+  }, [isLogin, dispatch]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    dispatch(clearError());
+
+    if (isLogin) {
+      dispatch(login({ email: formData.email, password: formData.password }));
+    } else {
+      if (formData.password !== formData.confirmPassword) {
+        return;
+      }
+      dispatch(register({
+        fullName: formData.fullName,
+        email: formData.email,
+        password: formData.password,
+        phone: formData.phone || undefined,
+      }));
+    }
+  };
+
+  const toggleMode = () => {
+    setIsLogin(!isLogin);
+    setFormData({
+      fullName: '',
+      email: '',
+      phone: '',
+      password: '',
+      confirmPassword: '',
+    });
   };
 
   return (
-    <button
-      className={cn(baseClasses, variantClasses[variant], className)}
-      {...props}
-    >
-      {children}
-    </button>
-  );
-};
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
+      <div className="w-full max-w-6xl grid md:grid-cols-2 gap-8 items-center">
+        {/* Left side - Branding */}
+        <div className="hidden md:flex flex-col items-center justify-center p-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-3xl shadow-2xl text-white">
+          <img
+            src={LogoImage}
+            alt="Lunio Technologies"
+            className="w-48 h-auto mb-8 drop-shadow-lg"
+          />
+          <h1 className="text-4xl font-bold mb-4 text-center">Welcome to Lunio Technologies</h1>
+          <p className="text-lg text-center text-blue-100 mb-8">
+            Your one-stop destination for premium hardware, software, and digital services
+          </p>
+          <div className="grid grid-cols-3 gap-4 text-center">
+            <div className="bg-white/10 backdrop-blur-sm p-4 rounded-xl">
+              <div className="text-3xl font-bold">1000+</div>
+              <div className="text-sm text-blue-100">Products</div>
+            </div>
+            <div className="bg-white/10 backdrop-blur-sm p-4 rounded-xl">
+              <div className="text-3xl font-bold">50K+</div>
+              <div className="text-sm text-blue-100">Customers</div>
+            </div>
+            <div className="bg-white/10 backdrop-blur-sm p-4 rounded-xl">
+              <div className="text-3xl font-bold">4.9</div>
+              <div className="text-sm text-blue-100">Rating</div>
+            </div>
+          </div>
+        </div>
 
-// Card components
-interface CardProps {
-  className?: string;
-  children: React.ReactNode;
-}
+        {/* Right side - Form */}
+        <div className="w-full max-w-md mx-auto">
+          <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-10">
+            <div className="text-center mb-8">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl mb-4">
+                {isLogin ? (
+                  <LogIn className="w-8 h-8 text-white" />
+                ) : (
+                  <UserPlus className="w-8 h-8 text-white" />
+                )}
+              </div>
+              <h2 className="text-3xl font-bold text-gray-900 mb-2">
+                {isLogin ? 'Welcome Back' : 'Create Account'}
+              </h2>
+              <p className="text-gray-600">
+                {isLogin
+                  ? 'Enter your credentials to access your account'
+                  : 'Sign up to start shopping with us'}
+              </p>
+            </div>
 
-const Card: React.FC<CardProps> = ({ className = '', children }) => (
-  <div className={cn("rounded-lg border bg-card text-card-foreground shadow-sm", className)}>
-    {children}
-  </div>
-);
+            {error && (
+              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-start gap-3">
+                <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <p className="text-sm text-red-800 font-medium">{error}</p>
+                </div>
+              </div>
+            )}
 
-const CardContent: React.FC<CardProps> = ({ className = '', children }) => (
-  <div className={cn("p-6 pt-0", className)}>
-    {children}
-  </div>
-);
-
-// Input component
-interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {}
-
-const Input: React.FC<InputProps> = ({ className = '', ...props }) => (
-  <input
-    className={cn(
-      "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
-      className
-    )}
-    {...props}
-  />
-);
-
-// Label component
-interface LabelProps extends React.LabelHTMLAttributes<HTMLLabelElement> {
-  children: React.ReactNode;
-}
-
-const Label: React.FC<LabelProps> = ({ className = '', children, ...props }) => (
-  <label
-    className={cn(
-      "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
-      className
-    )}
-    {...props}
-  >
-    {children}
-  </label>
-);
-
-// Main Login Page Component
-export const LoginPage = (): JSX.Element => {
-  const decorativeCircles = [
-    {
-      className: "w-[420px] h-[420px] top-[66px] left-[260px] rounded-[210px]",
-    },
-    {
-      className: "w-[360px] h-[360px] top-[460px] left-[-72px] rounded-[180px]",
-    },
-    {
-      className: "w-[360px] h-[360px] top-[636px] left-[337px] rounded-[180px]",
-    },
-  ];
-
-  return (
-    <main className="bg-white grid justify-items-center [align-items:start] w-screen">
-      <div className="bg-white w-[1440px] h-[1024px] relative">
-        <img
-          className="absolute w-[722px] top-5 left-5 object-cover h-[984px] rounded-[20px]"
-          alt="Rectangle"
-          src={heroBackgroundImage}
-        />
-
-        <section className="flex flex-col w-[658px] h-[984px] items-end absolute top-5 left-[762px] overflow-hidden">
-          <div className="relative self-stretch w-full bg-white h-[984px] rounded-[20px]" />
-
-          {decorativeCircles.map((circle, index) => (
-            <div
-              key={`circle-${index}`}
-              className={`${circle.className} absolute shadow-[inset_0px_0px_44px_10px_#ffffff80,0px_0px_4px_#000000a6] bg-[linear-gradient(90deg,rgba(0,194,255,1)_0%,rgba(138,43,226,1)_100%)]`}
-            />
-          ))}
-
-          <Card className="flex w-[520px] h-[774px] items-center gap-2.5 p-[50px] absolute top-[115px] left-[81px] bg-[#cfcfcf33] rounded-[20px] border-[none] backdrop-blur-[17.5px] backdrop-brightness-[100%] [-webkit-backdrop-filter:blur(17.5px)_brightness(100%)] before:content-[''] before:absolute before:inset-0 before:p-px before:rounded-[20px] before:[background:linear-gradient(193deg,rgba(255,255,255,0.5)_0%,rgba(255,255,255,0.5)_100%)] before:[-webkit-mask:linear-gradient(#fff_0_0)_content-box,linear-gradient(#fff_0_0)] before:[-webkit-mask-composite:xor] before:[mask-composite:exclude] before:z-[1] before:pointer-events-none">
-            <CardContent className="relative w-[420px] h-[674px] p-0">
-              <div className="flex flex-col w-[420px] items-start gap-[43px] absolute top-0 left-0">
-                <img
-                  className="relative w-[229px] h-[90px] object-cover"
-                  alt="Lunio Technologies Pvt Ltd"
-                  src={LogoImage}
-                />
-
-                <div className="flex flex-col items-center justify-center gap-5 relative self-stretch w-full flex-[0_0_auto]">
-                  <div className="inline-flex flex-col items-start gap-8 relative flex-[0_0_auto]">
-                    <header className="inline-flex flex-col items-start justify-center gap-[3px] relative flex-[0_0_auto]">
-                      <h1 className="relative w-fit mt-[-1.00px] [font-family:'Nunito_Sans',Helvetica] font-bold text-black text-4xl tracking-[0] leading-[normal]">
-                        Login to your Account
-                      </h1>
-
-                      <p className="relative w-fit [font-family:'Nunito_Sans',Helvetica] font-normal text-black text-base tracking-[0] leading-[normal]">
-                        See what is going on with your business
-                      </p>
-                    </header>
-
-                    <Button className="flex w-[420px] items-center justify-center gap-[13px] p-2.5 relative flex-[0_0_auto] rounded-[5px] border-2 text-[#373232] hover:bg-transparent">
-                      <span className="relative w-fit [font-family:'Nunito_Sans',Helvetica] font-bold text-[#373232] text-sm tracking-[0] leading-[normal]">
-                        Continue with Google
-                      </span>
-                    </Button>
+            <form onSubmit={handleSubmit} className="space-y-5">
+              {!isLogin && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Full Name *
+                  </label>
+                  <div className="relative">
+                    <User className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <input
+                      type="text"
+                      name="fullName"
+                      value={formData.fullName}
+                      onChange={handleChange}
+                      required={!isLogin}
+                      className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all outline-none"
+                      placeholder="John Doe"
+                    />
                   </div>
+                </div>
+              )}
 
-                  <div className="relative w-fit [font-family:'Nunito_Sans',Helvetica] font-semibold text-transparent text-xs tracking-[0] leading-[normal]">
-                    <span className="text-[#767676]">-------------</span>
-
-                    <span className="text-black"> or Sign in with Email </span>
-
-                    <span className="text-[#767676]">------------- </span>
-                  </div>
-
-                  <form className="inline-flex flex-col items-start gap-8 relative flex-[0_0_auto]">
-                    <div className="inline-flex flex-col items-start gap-6 relative flex-[0_0_auto]">
-                      <div className="inline-flex flex-col items-start gap-1 relative flex-[0_0_auto]">
-                        <Label className="relative w-fit mt-[-1.00px] [font-family:'Nunito_Sans',Helvetica] font-semibold text-black text-sm tracking-[0] leading-[normal]">
-                          Email
-                        </Label>
-
-                        <Input
-                          defaultValue="mail@abc.com"
-                          className="flex w-[20px] items-center gap-[13px] px-2.5 py-[13px] relative flex-[0_0_auto] rounded-[5px] border border-solid border-black [font-family:'Nunito_Sans',Helvetica] font-normal text-black text-sm tracking-[0] leading-[normal]"
-                        />
-                      </div>
-
-                      <div className="inline-flex flex-col items-start gap-2 relative flex-[0_0_auto]">
-                        <div className="inline-flex flex-col items-start gap-1 relative flex-[0_0_auto]">
-                          <Label className="relative w-fit mt-[-1.00px] [font-family:'Nunito_Sans',Helvetica] font-semibold text-black text-sm tracking-[0] leading-[normal]">
-                            Password
-                          </Label>
-
-                          <Input
-                            type="password"
-                            defaultValue="*****************"
-                            className="flex w-[420px] items-center gap-[13px] pt-[18px] pb-[13px] px-2.5 relative flex-[0_0_auto] rounded-[5px] border border-solid border-black [font-family:'Nunito_Sans',Helvetica] font-normal text-black text-[10px] tracking-[0] leading-[normal]"
-                          />
-                        </div>
-
-                        <div className="inline-flex items-start gap-[222px] relative flex-[0_0_auto]">
-                          <div className="inline-flex items-center justify-center gap-2 relative flex-[0_0_auto]">
-                            <div className="relative w-3 h-3 rounded-sm border-[none] bg-[linear-gradient(90deg,rgba(0,194,255,1)_0%,rgba(138,43,226,1)_100%)] before:content-[''] before:absolute before:inset-0 before:p-0.5 before:rounded-sm before:[background:linear-gradient(90deg,rgba(0,194,255,1)_0%,rgba(138,43,226,1)_100%)] before:[-webkit-mask:linear-gradient(#fff_0_0)_content-box,linear-gradient(#fff_0_0)] before:[-webkit-mask-composite:xor] before:[mask-composite:exclude] before:z-[1] before:pointer-events-none">
-                              <div className="relative w-2.5 h-2.5 -top-px -left-px">
-                                <img
-                                  className="absolute w-2 h-2 top-px left-px"
-                                  alt="Icons navigation"
-                                  src="/icons---navigation-others-10-check.svg"
-                                />
-                              </div>
-                            </div>
-
-                            <Label className="relative w-fit mt-[-1.00px] [font-family:'Nunito_Sans',Helvetica] font-normal text-white text-xs tracking-[0] leading-[normal]">
-                              Remember Me
-                            </Label>
-                          </div>
-
-                          <Button
-                            variant="link"
-                            className="relative w-fit mt-[-1.00px] [font-family:'Nunito_Sans',Helvetica] font-semibold text-white text-xs tracking-[0] leading-[normal] p-0 h-auto"
-                          >
-                            Forgot Password?
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-
-                    <Button className="flex w-[420px] items-center justify-center gap-[13px] pt-[13px] pb-3 px-2.5 relative flex-[0_0_auto] rounded-md bg-[linear-gradient(270deg,rgba(0,194,255,1)_0%,rgba(138,43,226,1)_100%)] h-auto hover:bg-[linear-gradient(270deg,rgba(0,194,255,0.9)_0%,rgba(138,43,226,0.9)_100%)]">
-                      <span className="relative w-fit mt-[-1.00px] [font-family:'Nunito_Sans',Helvetica] font-extrabold text-white text-lg tracking-[0] leading-[normal]">
-                        Login
-                      </span>
-                    </Button>
-                  </form>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Email Address *
+                </label>
+                <div className="relative">
+                  <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    required
+                    className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all outline-none"
+                    placeholder="you@example.com"
+                  />
                 </div>
               </div>
 
-              <div className="inline-flex items-center justify-center gap-2.5 absolute top-[649px] left-[52px]">
-                <span className="relative w-fit mt-[-1.00px] [font-family:'Nunito_Sans',Helvetica] font-normal text-black text-lg tracking-[0] leading-[normal]">
-                  Not Registered Yet?
-                </span>
+              {!isLogin && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Phone Number
+                  </label>
+                  <div className="relative">
+                    <Phone className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <input
+                      type="tel"
+                      name="phone"
+                      value={formData.phone}
+                      onChange={handleChange}
+                      className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all outline-none"
+                      placeholder="+1 (555) 000-0000"
+                    />
+                  </div>
+                </div>
+              )}
 
-                <Button
-                  variant="link"
-                  className="relative w-fit mt-[-1.00px] [font-family:'Nunito_Sans',Helvetica] font-semibold text-white text-lg tracking-[0] leading-[normal] p-0 h-auto"
-                >
-                  Create an account
-                </Button>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Password *
+                </label>
+                <div className="relative">
+                  <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    required
+                    minLength={6}
+                    className="w-full pl-12 pr-12 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all outline-none"
+                    placeholder="••••••••"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                  >
+                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  </button>
+                </div>
               </div>
-            </CardContent>
-          </Card>
-        </section>
+
+              {!isLogin && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Confirm Password *
+                  </label>
+                  <div className="relative">
+                    <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      name="confirmPassword"
+                      value={formData.confirmPassword}
+                      onChange={handleChange}
+                      required={!isLogin}
+                      minLength={6}
+                      className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all outline-none"
+                      placeholder="••••••••"
+                    />
+                  </div>
+                  {!isLogin && formData.password && formData.confirmPassword && formData.password !== formData.confirmPassword && (
+                    <p className="mt-2 text-sm text-red-600">Passwords do not match</p>
+                  )}
+                </div>
+              )}
+
+              {isLogin && (
+                <div className="flex items-center justify-between text-sm">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                    />
+                    <span className="text-gray-700">Remember me</span>
+                  </label>
+                  <button
+                    type="button"
+                    className="text-blue-600 hover:text-blue-700 font-medium"
+                  >
+                    Forgot password?
+                  </button>
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={loading || (!isLogin && formData.password !== formData.confirmPassword)}
+                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-4 rounded-xl shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                {loading ? (
+                  <>
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <span>Processing...</span>
+                  </>
+                ) : (
+                  <>
+                    {isLogin ? <LogIn className="w-5 h-5" /> : <UserPlus className="w-5 h-5" />}
+                    <span>{isLogin ? 'Sign In' : 'Create Account'}</span>
+                  </>
+                )}
+              </button>
+            </form>
+
+            <div className="mt-8 text-center">
+              <p className="text-gray-600">
+                {isLogin ? "Don't have an account?" : 'Already have an account?'}
+                <button
+                  type="button"
+                  onClick={toggleMode}
+                  className="ml-2 text-blue-600 hover:text-blue-700 font-semibold hover:underline"
+                >
+                  {isLogin ? 'Sign Up' : 'Sign In'}
+                </button>
+              </p>
+            </div>
+
+            {!isLogin && (
+              <div className="mt-6 text-center">
+                <p className="text-xs text-gray-500">
+                  By signing up, you agree to our Terms of Service and Privacy Policy
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
-    </main>
+    </div>
   );
 };
