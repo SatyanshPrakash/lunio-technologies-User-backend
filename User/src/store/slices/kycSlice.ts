@@ -46,7 +46,7 @@ export const submitKYC = createAsyncThunk(
         return rejectWithValue('Authentication required');
       }
 
-      const response = await fetch('http://localhost:5000/api/kyc/submit', {
+      const response = await fetch('http://localhost:5000/api/v1/kyc/submit', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -76,7 +76,7 @@ export const fetchKYCStatus = createAsyncThunk(
         return rejectWithValue('Authentication required');
       }
 
-      const response = await fetch('http://localhost:5000/api/kyc/status', {
+      const response = await fetch('http://localhost:5000/api/v1/kyc/status', {
         headers: {
           'Authorization': `Bearer ${token}`,
         },

@@ -31,7 +31,7 @@ export const login = createAsyncThunk(
   'auth/login',
   async (credentials: { email: string; password: string }, { rejectWithValue }) => {
     try {
-      const response = await fetch('http://localhost:5000/api/auth/login', {
+      const response = await fetch('http://localhost:5000/api/v1/auth/customer/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -45,8 +45,8 @@ export const login = createAsyncThunk(
         return rejectWithValue(data.message || 'Login failed');
       }
 
-      localStorage.setItem('token', data.token);
-      return data;
+      localStorage.setItem('token', data.data.token);
+      return data.data;
     } catch (error) {
       return rejectWithValue('Network error. Please try again.');
     }
@@ -57,7 +57,7 @@ export const register = createAsyncThunk(
   'auth/register',
   async (userData: { fullName: string; email: string; password: string; phone?: string }, { rejectWithValue }) => {
     try {
-      const response = await fetch('http://localhost:5000/api/auth/register', {
+      const response = await fetch('http://localhost:5000/api/v1/auth/customer/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -71,8 +71,8 @@ export const register = createAsyncThunk(
         return rejectWithValue(data.message || 'Registration failed');
       }
 
-      localStorage.setItem('token', data.token);
-      return data;
+      localStorage.setItem('token', data.data.token);
+      return data.data;
     } catch (error) {
       return rejectWithValue('Network error. Please try again.');
     }
@@ -88,7 +88,7 @@ export const loadUser = createAsyncThunk(
         return rejectWithValue('No token found');
       }
 
-      const response = await fetch('http://localhost:5000/api/auth/me', {
+      const response = await fetch('http://localhost:5000/api/v1/auth/me', {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -100,7 +100,7 @@ export const loadUser = createAsyncThunk(
         return rejectWithValue(data.message || 'Failed to load user');
       }
 
-      return data;
+      return data.data;
     } catch (error) {
       return rejectWithValue('Network error. Please try again.');
     }
