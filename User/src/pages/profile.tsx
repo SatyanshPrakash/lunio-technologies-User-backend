@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAppSelector, useAppDispatch } from '../store/hooks';
 import { loadUser } from '../store/slices/authSlice';
-import { User, Mail, Phone, Calendar, Shield, Edit, Save, X, Camera } from 'lucide-react';
+import { User, Mail, Phone, Calendar, Shield, CreditCard as Edit, Save, X, Camera } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export const ProfilePage = () => {

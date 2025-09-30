@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { login, register, clearError } from '../store/slices/authSlice';
-import { Eye, EyeOff, Mail, Lock, User, Phone, LogIn, UserPlus, AlertCircle } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, User, Phone, LogIn, UserPlus, CircleAlert as AlertCircle } from 'lucide-react';
 import LogoImage from "../../assets/favicons/lunio mein logo ai febicon png-2-01.png";
 
 export const LoginPage = () => {
