@@ -14,6 +14,7 @@ const { testConnection } = require('./config/database');
 // Import routes
 const authRoutes = require('./routes/auth');
 const productRoutes = require('./routes/products');
+const productImageRoutes = require('./routes/productImages');
 const orderRoutes = require('./routes/orders');
 const userRoutes = require('./routes/users');
 const reviewRoutes = require('./routes/reviews');
@@ -101,6 +102,7 @@ app.get('/health', (req, res) => {
 // API routes
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/products', productRoutes);
+app.use('/api/v1/products', productImageRoutes);
 app.use('/api/v1/orders', orderRoutes);
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/reviews', reviewRoutes);
