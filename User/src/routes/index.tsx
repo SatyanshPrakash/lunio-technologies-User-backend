@@ -10,6 +10,7 @@ import { OrderHistory } from '../pages/orderHistory';
 import { OrderDetails } from '../pages/orderDetails';
 import { LoginPage } from '../pages/login';
 import { ProfilePage } from '../pages/profile';
+import { KYCPage } from '../pages/kyc';
 import type { Order } from '../types';
 
 interface AppRoutesProps {
@@ -47,6 +48,15 @@ export const AppRoutes = ({ selectedOrder, onOrderSelect, onBackToHistory, mockO
         element={
           <ProtectedRoute>
             <ProfilePage />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/kyc"
+        element={
+          <ProtectedRoute>
+            <KYCPage />
           </ProtectedRoute>
         }
       />
