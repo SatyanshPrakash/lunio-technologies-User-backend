@@ -68,7 +68,7 @@ export const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
+    <div className="w-full bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
       <div className="w-full max-w-6xl grid md:grid-cols-2 gap-8 items-center">
         {/* Left side - Branding */}
         <div className="hidden md:flex flex-col items-center justify-center p-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-3xl shadow-2xl text-white">
