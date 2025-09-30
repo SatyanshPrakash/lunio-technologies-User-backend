@@ -1,4 +1,4 @@
-import { SearchIcon, Globe, ShoppingCart } from "lucide-react";
+import { Search as SearchIcon, Globe, ShoppingCart } from "lucide-react";
 import { useState } from "react";
 import { Button } from "../../assets/button"
 import { Input } from "../../assets/input";
