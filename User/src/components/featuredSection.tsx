@@ -4,7 +4,7 @@ import { Badge } from "./badge";
 import { Card, CardContent } from "./card";
 import { Separator } from "./seprator";
 import { Star } from "lucide-react";
-import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
+import { ChevronLeft as ChevronLeftIcon, ChevronRight as ChevronRightIcon } from "lucide-react";
 import { Button } from "../assets/button";
 import SampleImage from "../assets/ba5309c6-39fa-4f0f-9c62-de5d63d00b3b.jpg";
 
